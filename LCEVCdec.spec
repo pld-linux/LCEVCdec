@@ -13,6 +13,8 @@ Group:		Libraries
 #Source0Download: https://github.com/v-novaltd/LCEVCdec/releases
 Source0:	https://github.com/v-novaltd/LCEVCdec/archive/%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	5bb2d7180bfa231cf1a4273a7831b6eb
+Patch0:		%{name}-includes.patch
+Patch1:		%{name}-libdir.patch
 URL:		https://github.com/v-novaltd/LCEVCdec
 BuildRequires:	cmake >= 3.19.0
 BuildRequires:	libstdc++-devel >= 6:7
@@ -73,6 +75,8 @@ Dokumentacja API bibliotek dekodera LCEVC.
 
 %prep
 %setup -q
+%patch -P0 -p1
+%patch -P1 -p1
 
 # fake for git archive, not checkout
 printf RELEASE > .githash
