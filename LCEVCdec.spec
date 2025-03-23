@@ -6,14 +6,13 @@
 Summary:	LCEVC Decoder SDK library
 Summary(pl.UTF-8):	Biblioteka SDK dekodera LCEVC
 Name:		LCEVCdec
-Version:	3.3.4
+Version:	3.3.5
 Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/v-novaltd/LCEVCdec/releases
 Source0:	https://github.com/v-novaltd/LCEVCdec/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	5bb2d7180bfa231cf1a4273a7831b6eb
-Patch0:		%{name}-includes.patch
+# Source0-md5:	562f4840a33599200e1a92d9981fd580
 Patch1:		%{name}-libdir.patch
 URL:		https://github.com/v-novaltd/LCEVCdec
 BuildRequires:	cmake >= 3.19.0
@@ -75,7 +74,6 @@ Dokumentacja API bibliotek dekodera LCEVC.
 
 %prep
 %setup -q
-%patch -P0 -p1
 %patch -P1 -p1
 
 # fake for git archive, not checkout
