@@ -8,11 +8,11 @@
 +install(TARGETS lcevc_dec_api_utility DESTINATION lib${LIB_SUFFIX})
  install(FILES ${INTERFACES} DESTINATION include/LCEVC/api_utility)
  install(FILES ${SOURCES} ${HEADERS} DESTINATION ${CMAKE_INSTALL_DOCDIR}/src/api_utility)
---- LCEVCdec-3.3.4/src/core/sequencing/CMakeLists.txt.orig	2025-03-17 12:21:58.000000000 +0100
-+++ LCEVCdec-3.3.4/src/core/sequencing/CMakeLists.txt	2025-03-22 11:49:28.067306280 +0100
+--- LCEVCdec-3.3.7/src/core/sequencing/CMakeLists.txt.orig	2025-05-01 15:58:07.000000000 +0200
++++ LCEVCdec-3.3.7/src/core/sequencing/CMakeLists.txt	2025-05-06 05:33:26.077115903 +0200
 @@ -28,4 +28,4 @@ target_include_directories(
      PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
  
- install(FILES ${INTERFACES} DESTINATION "include/LCEVC")
+ install(FILES ${INTERFACES} DESTINATION "include/LCEVC/sequencing")
 -install(TARGETS lcevc_dec_core_sequencing DESTINATION lib)
 +install(TARGETS lcevc_dec_core_sequencing DESTINATION lib${LIB_SUFFIX})
