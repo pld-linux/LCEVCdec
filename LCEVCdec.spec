@@ -13,6 +13,7 @@ Group:		Libraries
 #Source0Download: https://github.com/v-novaltd/LCEVCdec/releases
 Source0:	https://github.com/v-novaltd/LCEVCdec/archive/%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	83db8c568c6faf0401550f8d8e5d1e7e
+Patch0:		%{name}-lib-utility.patch
 Patch1:		%{name}-libdir.patch
 URL:		https://github.com/v-novaltd/LCEVCdec
 BuildRequires:	CLI11-devel
@@ -88,6 +89,7 @@ Dokumentacja API bibliotek dekodera LCEVC.
 
 %prep
 %setup -q
+%patch -P0 -p1
 %patch -P1 -p1
 
 # fake for git archive, not checkout
@@ -102,7 +104,6 @@ printf 2025-06-18 > .gitdate
 install -d build
 cd build
 %cmake .. \
-	-DVN_SDK_EXECUTABLES=ON \
 	-DVN_SDK_JSON_CONFIG=ON \
 	%{?with_apidocs:-DVN_SDK_DOCS=ON}
 
@@ -114,9 +115,11 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+# not installed if tests/examples SDK not enabled
+cp -p build/lib/{liblcevc_dec_api_static,liblcevc_dec_core_static,liblcevc_dec_enhancement_cpu,liblcevc_dec_overlay_images}.a $RPM_BUILD_ROOT%{_libdir}
+
 # examples/tests
-%{__rm} $RPM_BUILD_ROOT%{_bindir}/lcevc_dec_{sample,test_harness}
-%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/{sample_cpp,src}
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/src
 # packaged as %doc
 %{__rm} $RPM_BUILD_ROOT%{_docdir}/README.md
 %{__rm} $RPM_BUILD_ROOT%{_docdir}/licenses/{COPYING,LICENSE.md}

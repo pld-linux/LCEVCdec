@@ -16,3 +16,52 @@
  install(FILES ${INTERFACES} DESTINATION "include/LCEVC/sequencing")
 -install(TARGETS lcevc_dec_core_sequencing DESTINATION lib)
 +install(TARGETS lcevc_dec_core_sequencing DESTINATION lib${LIB_SUFFIX})
+--- LCEVCdec-3.3.8/src/utility/test/utilities/CMakeLists.txt.orig	2025-06-13 11:10:55.000000000 +0200
++++ LCEVCdec-3.3.8/src/utility/test/utilities/CMakeLists.txt	2025-07-01 21:38:27.772229240 +0200
+@@ -25,4 +25,4 @@ target_link_libraries(lcevc_dec_unit_tes
+ 
+ add_library(lcevc_dec::unit_test_utilities ALIAS lcevc_dec_unit_test_utilities)
+ 
+-install(TARGETS lcevc_dec_unit_test_utilities DESTINATION lib)
++install(TARGETS lcevc_dec_unit_test_utilities DESTINATION lib${LIB_SUFFIX})
+--- LCEVCdec-3.3.8/src/utility/CMakeLists.txt.orig	2025-07-01 21:38:41.835642631 +0200
++++ LCEVCdec-3.3.8/src/utility/CMakeLists.txt	2025-07-01 21:38:44.775659367 +0200
+@@ -37,6 +37,6 @@ add_library(lcevc_dec::utility ALIAS lce
+ 
+ include(GNUInstallDirs)
+ 
+-install(TARGETS lcevc_dec_utility DESTINATION lib)
++install(TARGETS lcevc_dec_utility DESTINATION lib${LIB_SUFFIX})
+ install(FILES ${INTERFACES} DESTINATION include/LCEVC/utility)
+ install(FILES ${SOURCES} ${HEADERS} DESTINATION ${CMAKE_INSTALL_DOCDIR}/src/utility)
+--- LCEVCdec-3.3.8/src/overlay_images/CMakeLists.txt.orig	2025-06-13 11:10:55.000000000 +0200
++++ LCEVCdec-3.3.8/src/overlay_images/CMakeLists.txt	2025-07-01 21:38:58.895739746 +0200
+@@ -24,5 +24,5 @@ target_link_libraries(lcevc_dec_overlay_
+ add_library(lcevc_dec::overlay_images ALIAS lcevc_dec_overlay_images)
+ 
+ if (NOT BUILD_SHARED_LIBS)
+-    install(TARGETS lcevc_dec_overlay_images DESTINATION lib)
++    install(TARGETS lcevc_dec_overlay_images DESTINATION lib${LIB_SUFFIX})
+ endif ()
+--- LCEVCdec-3.3.8/src/core/decoder/CMakeLists.txt.orig	2025-06-13 11:10:55.000000000 +0200
++++ LCEVCdec-3.3.8/src/core/decoder/CMakeLists.txt	2025-07-01 21:39:20.952531972 +0200
+@@ -168,7 +168,7 @@ endif ()
+ 
+ get_target_property(IS_APPLE_FRAMEWORK lcevc_dec_core FRAMEWORK)
+ if (IS_APPLE_FRAMEWORK)
+-    install(TARGETS lcevc_dec_core DESTINATION lib)
++    install(TARGETS lcevc_dec_core DESTINATION lib${LIB_SUFFIX})
+ else ()
+     install(TARGETS lcevc_dec_core)
+ endif ()
+--- LCEVCdec-3.3.8/src/api/CMakeLists.txt.orig	2025-06-13 11:10:55.000000000 +0200
++++ LCEVCdec-3.3.8/src/api/CMakeLists.txt	2025-07-01 21:39:52.819380041 +0200
+@@ -59,7 +59,7 @@ include(GNUInstallDirs)
+ 
+ get_target_property(IS_APPLE_FRAMEWORK lcevc_dec_api FRAMEWORK)
+ if (IS_APPLE_FRAMEWORK)
+-    install(TARGETS lcevc_dec_api DESTINATION lib)
++    install(TARGETS lcevc_dec_api DESTINATION lib${LIB_SUFFIX})
+ else ()
+     install(TARGETS lcevc_dec_api)
+ endif ()

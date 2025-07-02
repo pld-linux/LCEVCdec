@@ -1,0 +1,12 @@
+--- LCEVCdec-3.3.8/CMakeLists.txt.orig	2025-06-13 11:10:55.000000000 +0200
++++ LCEVCdec-3.3.8/CMakeLists.txt	2025-07-02 06:28:13.218350665 +0200
+@@ -94,9 +94,7 @@ if (VN_SDK_API_LAYER)
+     endif ()
+ endif ()
+ 
+-if (VN_SDK_EXECUTABLES OR VN_SDK_UNIT_TESTS)
+     lcevc_add_subdirectory(src/utility)
+-endif ()
+ 
+ # Core layer
+ lcevc_add_subdirectory(src/core/decoder)
