@@ -6,15 +6,15 @@
 Summary:	LCEVC Decoder SDK library
 Summary(pl.UTF-8):	Biblioteka SDK dekodera LCEVC
 Name:		LCEVCdec
-Version:	3.3.8
+Version:	4.0.5
 Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/v-novaltd/LCEVCdec/releases
 Source0:	https://github.com/v-novaltd/LCEVCdec/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	83db8c568c6faf0401550f8d8e5d1e7e
+# Source0-md5:	cceb6df703f1129173ec906a802c8945
 Patch0:		%{name}-lib-utility.patch
-Patch1:		%{name}-libdir.patch
+Patch1:		%{name}-link.patch
 URL:		https://github.com/v-novaltd/LCEVCdec
 BuildRequires:	CLI11-devel
 BuildRequires:	cmake >= 3.19.0
@@ -28,9 +28,9 @@ BuildRequires:	doxygen
 BuildRequires:	java-plantuml
 BuildRequires:	jre
 BuildRequires:	python3-breathe >= 4.35.0
-BuildRequires:	python3-sphinx_rtd_theme >= 1.2.0
-BuildRequires:	python3-sphinxcontrib-plantuml >= 0.25
-BuildRequires:	sphinx-pdg >= 6.2.1
+BuildRequires:	python3-sphinx_rtd_theme >= 3.0.1
+BuildRequires:	python3-sphinxcontrib-plantuml >= 0.30
+BuildRequires:	sphinx-pdg >= 8.0.2
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -89,6 +89,7 @@ Dokumentacja API bibliotek dekodera LCEVC.
 
 %prep
 %setup -q
+# patch0 to get liblcevc_dec_utility.a
 %patch -P0 -p1
 %patch -P1 -p1
 
@@ -98,7 +99,7 @@ printf RELEASE > .gitlonghash
 printf RELEASE > .gitbranch
 printf %{version} > .gitversion
 printf %{version} > .gitshortversion
-printf 2025-06-18 > .gitdate
+printf 2026-02-09 > .gitdate
 
 %build
 install -d build
@@ -116,12 +117,9 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 # not installed if tests/examples SDK not enabled
-cp -p build/lib/{liblcevc_dec_api_static,liblcevc_dec_core_static,liblcevc_dec_enhancement_cpu,liblcevc_dec_overlay_images}.a $RPM_BUILD_ROOT%{_libdir}
+cp -p build/lib/{liblcevc_dec_color_conversion,liblcevc_dec_overlay_images}.a $RPM_BUILD_ROOT%{_libdir}
 
-# examples/tests
-%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/src
 # packaged as %doc
-%{__rm} $RPM_BUILD_ROOT%{_docdir}/README.md
 %{__rm} $RPM_BUILD_ROOT%{_docdir}/licenses/{COPYING,LICENSE.md}
 
 %clean
@@ -133,23 +131,35 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc COPYING LICENSE.md README.md
-%attr(755,root,root) %{_libdir}/liblcevc_dec_api.so
-%attr(755,root,root) %{_libdir}/liblcevc_dec_core.so
+%{_libdir}/liblcevc_dec_api.so.*.*.*
+%ghost %{_libdir}/liblcevc_dec_api.so.4
+%{_libdir}/liblcevc_dec_legacy.so.1
+%{_libdir}/liblcevc_dec_pipeline_cpu.so.1
+%{_libdir}/liblcevc_dec_pipeline_legacy.so.1
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/liblcevc_dec_api_utility.a
-%attr(755,root,root) %{_libdir}/liblcevc_dec_core_sequencing.a
-%attr(755,root,root) %{_libdir}/liblcevc_dec_enhancement_cpu.a
-%attr(755,root,root) %{_libdir}/liblcevc_dec_overlay_images.a
-%attr(755,root,root) %{_libdir}/liblcevc_dec_utility.a
+%{_libdir}/liblcevc_dec_api.so
+%{_libdir}/liblcevc_dec_legacy.so
+%{_libdir}/liblcevc_dec_pipeline_cpu.so
+%{_libdir}/liblcevc_dec_pipeline_legacy.so
+%{_libdir}/liblcevc_dec_color_conversion.a
+%{_libdir}/liblcevc_dec_extract.a
+%{_libdir}/liblcevc_dec_overlay_images.a
+%{_libdir}/liblcevc_dec_utility.a
 %{_includedir}/LCEVC
 %{_pkgconfigdir}/lcevc_dec.pc
+%{_pkgconfigdir}/lcevc_dec_extract.pc
+%{_pkgconfigdir}/lcevc_dec_utility.pc
 
 %files static
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/liblcevc_dec_api_static.a
-%attr(755,root,root) %{_libdir}/liblcevc_dec_core_static.a
+%{_libdir}/liblcevc_dec_api_utility.a
+%{_libdir}/liblcevc_dec_common.a
+%{_libdir}/liblcevc_dec_enhancement.a
+%{_libdir}/liblcevc_dec_pipeline.a
+%{_libdir}/liblcevc_dec_pixel_processing.a
+%{_libdir}/liblcevc_dec_sequencer.a
 
 %if %{with apidocs}
 %files apidocs
