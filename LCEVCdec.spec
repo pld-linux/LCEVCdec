@@ -1,26 +1,32 @@
 # TODO: complete apidocs
 #
 # Conditional build:
+%bcond_without	vulkan		# Vulkan pipeline
 %bcond_with	apidocs		# API documentation
 #
 Summary:	LCEVC Decoder SDK library
 Summary(pl.UTF-8):	Biblioteka SDK dekodera LCEVC
 Name:		LCEVCdec
-Version:	4.0.5
+Version:	4.1.0
 Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/v-novaltd/LCEVCdec/releases
 Source0:	https://github.com/v-novaltd/LCEVCdec/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	cceb6df703f1129173ec906a802c8945
+# Source0-md5:	65cf77ecf46800e340d8e578b0bb6534
 Patch0:		%{name}-lib-utility.patch
-Patch1:		%{name}-link.patch
 URL:		https://github.com/v-novaltd/LCEVCdec
 BuildRequires:	CLI11-devel
+%if %{with vulkan}
+BuildRequires:	Vulkan-Headers
+BuildRequires:	Vulkan-Loader-devel
+%endif
 BuildRequires:	cmake >= 3.19.0
 BuildRequires:	libfmt-devel
 BuildRequires:	libstdc++-devel >= 6:7
 BuildRequires:	nlohmann-json-devel
+BuildRequires:	pkgconfig
+%{?with_vulkan:BuildRequires:	python3 >= 1:3}
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.605
 %if %{with apidocs}
@@ -91,7 +97,6 @@ Dokumentacja API bibliotek dekodera LCEVC.
 %setup -q
 # patch0 to get liblcevc_dec_utility.a
 %patch -P0 -p1
-%patch -P1 -p1
 
 # fake for git archive, not checkout
 printf RELEASE > .githash
@@ -99,14 +104,15 @@ printf RELEASE > .gitlonghash
 printf RELEASE > .gitbranch
 printf %{version} > .gitversion
 printf %{version} > .gitshortversion
-printf 2026-02-09 > .gitdate
+printf 2026-04-30 > .gitdate
 
 %build
 install -d build
 cd build
 %cmake .. \
+	%{?with_apidocs:-DVN_SDK_DOCS=ON} \
 	-DVN_SDK_JSON_CONFIG=ON \
-	%{?with_apidocs:-DVN_SDK_DOCS=ON}
+	%{?with_vulkan:-DVN_SDK_PIPELINE_VULKAN=ON}
 
 %{__make}
 
@@ -115,9 +121,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
-
-# not installed if tests/examples SDK not enabled
-cp -p build/lib/{liblcevc_dec_color_conversion,liblcevc_dec_overlay_images}.a $RPM_BUILD_ROOT%{_libdir}
 
 # packaged as %doc
 %{__rm} $RPM_BUILD_ROOT%{_docdir}/licenses/{COPYING,LICENSE.md}
@@ -133,19 +136,20 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING LICENSE.md README.md
 %{_libdir}/liblcevc_dec_api.so.*.*.*
 %ghost %{_libdir}/liblcevc_dec_api.so.4
-%{_libdir}/liblcevc_dec_legacy.so.1
 %{_libdir}/liblcevc_dec_pipeline_cpu.so.1
-%{_libdir}/liblcevc_dec_pipeline_legacy.so.1
+%if %{with vulkan}
+%{_libdir}/liblcevc_dec_pipeline_vulkan.so.1
+%endif
 
 %files devel
 %defattr(644,root,root,755)
 %{_libdir}/liblcevc_dec_api.so
-%{_libdir}/liblcevc_dec_legacy.so
 %{_libdir}/liblcevc_dec_pipeline_cpu.so
-%{_libdir}/liblcevc_dec_pipeline_legacy.so
-%{_libdir}/liblcevc_dec_color_conversion.a
+%if %{with vulkan}
+%{_libdir}/liblcevc_dec_pipeline_vulkan.so
+%endif
+%{_libdir}/liblcevc_dec_api_utility.a
 %{_libdir}/liblcevc_dec_extract.a
-%{_libdir}/liblcevc_dec_overlay_images.a
 %{_libdir}/liblcevc_dec_utility.a
 %{_includedir}/LCEVC
 %{_pkgconfigdir}/lcevc_dec.pc
@@ -154,12 +158,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/liblcevc_dec_api_utility.a
 %{_libdir}/liblcevc_dec_common.a
 %{_libdir}/liblcevc_dec_enhancement.a
 %{_libdir}/liblcevc_dec_pipeline.a
 %{_libdir}/liblcevc_dec_pixel_processing.a
-%{_libdir}/liblcevc_dec_sequencer.a
 
 %if %{with apidocs}
 %files apidocs
