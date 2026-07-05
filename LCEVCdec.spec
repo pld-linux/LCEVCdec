@@ -3,18 +3,18 @@
 # Conditional build:
 %bcond_without	vulkan		# Vulkan pipeline
 %bcond_with	apidocs		# API documentation
+%bcond_without	static_libs	# static libraries
 #
 Summary:	LCEVC Decoder SDK library
 Summary(pl.UTF-8):	Biblioteka SDK dekodera LCEVC
 Name:		LCEVCdec
-Version:	4.1.0
+Version:	4.2.0
 Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/v-novaltd/LCEVCdec/releases
 Source0:	https://github.com/v-novaltd/LCEVCdec/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	65cf77ecf46800e340d8e578b0bb6534
-Patch0:		%{name}-lib-utility.patch
+# Source0-md5:	c555fc9a0d2e54fba4d658f5d85b33f8
 URL:		https://github.com/v-novaltd/LCEVCdec
 BuildRequires:	CLI11-devel
 %if %{with vulkan}
@@ -22,6 +22,7 @@ BuildRequires:	Vulkan-Headers
 BuildRequires:	Vulkan-Loader-devel
 %endif
 BuildRequires:	cmake >= 3.19.0
+BuildRequires:	ffmpeg-devel
 BuildRequires:	libfmt-devel
 BuildRequires:	libstdc++-devel >= 6:7
 BuildRequires:	nlohmann-json-devel
@@ -95,8 +96,6 @@ Dokumentacja API bibliotek dekodera LCEVC.
 
 %prep
 %setup -q
-# patch0 to get liblcevc_dec_utility.a
-%patch -P0 -p1
 
 # fake for git archive, not checkout
 printf RELEASE > .githash
@@ -107,20 +106,29 @@ printf %{version} > .gitshortversion
 printf 2026-04-30 > .gitdate
 
 %build
-install -d build
-cd build
-%cmake .. \
+# enable VN_SDK_EXECUTABLES to get more libs
+%cmake -B build \
 	%{?with_apidocs:-DVN_SDK_DOCS=ON} \
+	-DVN_SDK_EXECUTABLES=ON \
 	-DVN_SDK_JSON_CONFIG=ON \
 	%{?with_vulkan:-DVN_SDK_PIPELINE_VULKAN=ON}
 
-%{__make}
+%{__make} -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+%if %{with static_libs}
+# not installed since 4.2.0 when shared libs are built
+install -p build/lib/liblcevc_dec_{common,enhancement,pipeline,pixel_processing}.a $RPM_BUILD_ROOT%{_libdir}
+%endif
+
+# not required artifacts from VN_SDK_EXECUTABLES
+%{__rm} $RPM_BUILD_ROOT%{_bindir}/{lcevc_dec_enhancement_sample,lcevc_dec_sample,lcevc_dec_test_harness}
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/sample_cpp
 
 # packaged as %doc
 %{__rm} $RPM_BUILD_ROOT%{_docdir}/licenses/{COPYING,LICENSE.md}
